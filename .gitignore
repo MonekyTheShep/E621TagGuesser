@@ -1,0 +1,31 @@
+
+export/*
+/dump/*
+/.dump/*
+local/*
+lib/*
+
+.vscode/*
+.haxelib/
+*.code-workspace
+
+*.hash
+
+.history
+.ionide
+
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# moneky's fucking macbook shit
+# Ignore Mac DS_Store files
+.DS_Store
+**/.DS_Store
+/build
+/.VSCodeCounter
+/publish
+package.zip
+/Example Usage/build
+/E621TagGuesser/export
