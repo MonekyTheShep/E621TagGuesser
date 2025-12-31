@@ -11,6 +11,7 @@ import monosodiumplusplus.MonoSodiumPlusPlus;
 import openfl.display.BitmapData;
 import openfl.events.Event;
 import openfl.net.URLLoader;
+import openfl.net.URLLoaderDataFormat;
 import openfl.net.URLRequest;
 import openfl.net.URLRequestHeader;
 import openfl.utils.ByteArray;
@@ -86,7 +87,7 @@ class PlayState extends FlxState
 		if (imageUrl != "")
 		{
 			loader.addEventListener(Event.COMPLETE, onComplete);
-			loader.dataFormat = "binary";
+			loader.dataFormat = URLLoaderDataFormat.BINARY;
 			var request:URLRequest = new URLRequest(imageUrl);
 			imageUrl = "";
 			request.requestHeaders = [
