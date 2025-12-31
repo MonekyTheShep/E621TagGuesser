@@ -8,6 +8,7 @@ import flixel.ui.FlxButton;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
 import haxe.io.Bytes;
+import lime.app.Future;
 import monosodiumplusplus.MonoSodiumPlusPlus;
 import openfl.display.BitmapData;
 import openfl.events.Event;
@@ -56,7 +57,7 @@ class PlayState extends FlxState
 
 	function getUrl(onSuccess:String->Void):Void
 	{
-		sys.thread.Thread.create(() ->
+		var future = new Future(function()
 		{
 			var api:MonoSodiumPlusPlus = new MonoSodiumPlusPlus();
 
@@ -65,7 +66,7 @@ class PlayState extends FlxState
 			var id:Int;
 			var tag:String;
 
-			api.randomPost.setTag("-animated").setTag("pokemon").setTag("solo").setTag("-ralsei");
+			api.randomPost.setTag("-animated").setTag("pokemon").setTag("solo").setTag("rating:safe");
 
 			api.randomPost.search(postData ->
 			{
@@ -74,8 +75,13 @@ class PlayState extends FlxState
 				tag = postData.tag_string;
 			}, err -> trace("Error: " + err));
 
-			onSuccess(url);
 			trace(url);
+			return url;
+		}, true);
+
+		future.onComplete(function(url)
+		{
+			onSuccess(url);
 		});
 	}
 
