@@ -85,7 +85,7 @@ class PlayState extends FlxState
 		if (imageUrl != "")
 		{
 			loader.addEventListener(Event.COMPLETE, onComplete);
-			loader.dataFormat = "binary";
+			loader.dataFormat = URLLoaderDataFormat.BINARY;
 			var request:URLRequest = new URLRequest(imageUrl);
 			imageUrl = "";
 			request.requestHeaders = [
