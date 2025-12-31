@@ -4,29 +4,37 @@ import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
-import flixel.graphics.FlxGraphic;
+import flixel.ui.FlxButton;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
 import haxe.io.Bytes;
 import monosodiumplusplus.MonoSodiumPlusPlus;
-import monosodiumplusplus.RateLimiter;
 import openfl.display.BitmapData;
+import openfl.events.Event;
+import openfl.events.IOErrorEvent;
+import openfl.events.ProgressEvent;
+import openfl.net.FileReference;
+import openfl.net.URLLoader;
+import openfl.net.URLRequest;
+import openfl.net.URLRequestHeader;
 import openfl.utils.ByteArray;
 
 class PlayState extends FlxState
 {
 	var spr:FlxSprite;
 	var uiCamera:FlxCamera;
+	var loader:URLLoader = new URLLoader();
+	var imageUrl:String = "";
 
 	override public function create()
 	{
 		super.create();
-		var button = new FlxButton(0, 0, "Reload", () -> {
-			#if js
-			// worker for js
-			#else
-			getImage();
-			#end
+		var button = new FlxButton(0, 0, "Reload", () ->
+		{
+			getUrl(_url ->
+			{
+				imageUrl = _url;
+			});
 		});
 
 		uiCamera = new FlxCamera();
@@ -40,68 +48,62 @@ class PlayState extends FlxState
 		add(button);
 		add(spr);
 
-		#if js
-		#else
-		getImage();
-		#end
-	}
-
-	function getImage()
-	{
-		getImageData(data ->
+		getUrl(_url ->
 		{
-			spr.loadGraphic(BitmapData.fromBytes(data));
-			final factor:Float = Math.min(FlxG.width / spr.width, FlxG.height / spr.height);
-			spr.scale.set(factor, factor);
-			spr.screenCenter();
-			spr.antialiasing = true;
+			imageUrl = _url;
 		});
 	}
 
-	function getImageData(onSuccess:Bytes->Void):Void
+	function getUrl(onSuccess:String->Void):Void
 	{
-		var api:MonoSodiumPlusPlus = new MonoSodiumPlusPlus();
-
-		api.verboseMode = true;
-		var url:String;
-		var id:Int;
-		var tag:String;
-
-		api.randomPost.setTag("-animated").setTag("femboy").setTag("solo").setTag("-ralsei");
-
-		// api.posts.setTag("solo").setTag("femboy").setTag("rating:safe").setLimit(5).setPage(1);
-
-		// api.posts.search(postData ->
-		// {
-		// 	for (post in postData.posts)
-		// 	{
-		// 		trace("Post url", post.file.url);
-		// 	}
-		// }, err -> trace("Error: " + err));
-
-		api.randomPost.search(postData ->
+		sys.thread.Thread.create(() ->
 		{
-			url = postData.file_url;
-			id = postData.id;
-			tag = postData.tag_string;
-		}, err -> trace("Error: " + err));
-		trace(url, id, tag);
+			var api:MonoSodiumPlusPlus = new MonoSodiumPlusPlus();
 
-		var httpBuilder:HttpBuilder = new HttpBuilder(url);
+			api.verboseMode = true;
+			var url:String;
+			var id:Int;
+			var tag:String;
 
-		httpBuilder.setHeader("User-Agent", "E621TagGuesser/1.0 (by MonekyTheShep on github)");
+			api.randomPost.setTag("-animated").setTag("femboy").setTag("solo").setTag("-ralsei");
 
-		try
-		{
-			httpBuilder.getHttpData(data ->
+			api.randomPost.search(postData ->
 			{
-				onSuccess(data);
-			});
-		}
+				url = postData.file_url;
+				id = postData.id;
+				tag = postData.tag_string;
+			}, err -> trace("Error: " + err));
+
+			onSuccess(url);
+			trace(url);
+		});
 	}
 
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
+		if (imageUrl != "")
+		{
+			loader.addEventListener(Event.COMPLETE, onComplete);
+			loader.dataFormat = "binary";
+			var request:URLRequest = new URLRequest(imageUrl);
+			imageUrl = "";
+			request.requestHeaders = [
+				new URLRequestHeader("User-Agent", "MonoSodiumPlusPlus/1.0 (by MonekyTheShep on github)")
+			];
+			loader.load(request);
+			
+		}
+	}
+
+	function onComplete(e:Event):Void
+	{
+		var bytes:ByteArray = loader.data;
+
+		spr.loadGraphic(BitmapData.fromBytes(bytes));
+		final factor:Float = Math.min(FlxG.width / spr.width, FlxG.height / spr.height);
+		spr.scale.set(factor, factor);
+		spr.screenCenter();
+		spr.antialiasing = true;
 	}
 }
