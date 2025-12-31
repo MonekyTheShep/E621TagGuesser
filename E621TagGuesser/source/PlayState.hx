@@ -52,7 +52,7 @@ class PlayState extends FlxState
 
 	function getUrl(onSuccess:String->Void):Void
 	{
-		var future = new Future(function()
+		var future = new Future(() ->
 		{
 			var api:MonoSodiumPlusPlus = new MonoSodiumPlusPlus();
 
@@ -65,7 +65,7 @@ class PlayState extends FlxState
 
 			api.randomPost.search(postData ->
 			{
-				url = postData.file_url;
+				url = postData.sample_url;
 				id = postData.id;
 				tag = postData.tag_string;
 			}, err -> trace("Error: " + err));
