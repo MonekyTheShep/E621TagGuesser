@@ -65,7 +65,7 @@ class PlayState extends FlxState
 			var id:Int;
 			var tag:String;
 
-			api.randomPost.setTag("-animated").setTag("femboy").setTag("solo").setTag("-ralsei");
+			api.randomPost.setTag("-animated").setTag("pokemon").setTag("solo").setTag("-ralsei");
 
 			api.randomPost.search(postData ->
 			{
@@ -85,7 +85,7 @@ class PlayState extends FlxState
 		if (imageUrl != "")
 		{
 			loader.addEventListener(Event.COMPLETE, onComplete);
-			loader.dataFormat = URLLoaderDataFormat.BINARY;
+			loader.dataFormat = "binary";
 			var request:URLRequest = new URLRequest(imageUrl);
 			imageUrl = "";
 			request.requestHeaders = [
