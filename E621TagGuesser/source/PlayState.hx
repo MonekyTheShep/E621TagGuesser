@@ -61,7 +61,7 @@ class PlayState extends FlxState
 			var id:Int;
 			var tag:String;
 
-			api.randomPost.setTag("-animated").setTag("pokemon").setTag("solo").setTag("rating:safe");
+			api.randomPost.setTag("-animated").setTag("femboy").setTag("solo").setTag("rating:safe");
 
 			api.randomPost.search(postData ->
 			{
