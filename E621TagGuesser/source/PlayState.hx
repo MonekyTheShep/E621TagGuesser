@@ -5,16 +5,11 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.ui.FlxButton;
-import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
-import haxe.io.Bytes;
 import lime.app.Future;
 import monosodiumplusplus.MonoSodiumPlusPlus;
 import openfl.display.BitmapData;
 import openfl.events.Event;
-import openfl.events.IOErrorEvent;
-import openfl.events.ProgressEvent;
-import openfl.net.FileReference;
 import openfl.net.URLLoader;
 import openfl.net.URLRequest;
 import openfl.net.URLRequestHeader;
@@ -32,9 +27,9 @@ class PlayState extends FlxState
 		super.create();
 		var button = new FlxButton(0, 0, "Reload", () ->
 		{
-			getUrl(_url ->
+			getUrl(url ->
 			{
-				imageUrl = _url;
+				imageUrl = url;
 			});
 		});
 
@@ -49,9 +44,9 @@ class PlayState extends FlxState
 		add(button);
 		add(spr);
 
-		getUrl(_url ->
+		getUrl(url ->
 		{
-			imageUrl = _url;
+			imageUrl = url;
 		});
 	}
 
