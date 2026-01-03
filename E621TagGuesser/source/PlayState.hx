@@ -67,6 +67,7 @@ class PlayState extends FlxState
 			api.randomPost.search(postData ->
 			{
 				url = postData.sample_url;
+				onSuccess(url);
 				id = postData.id;
 				tag = postData.tag_string;
 			}, err -> trace("Error: " + err));
@@ -75,10 +76,6 @@ class PlayState extends FlxState
 			return url;
 		}, true);
 
-		future.onComplete(function(url)
-		{
-			onSuccess(url);
-		});
 	}
 
 	override public function update(elapsed:Float)
