@@ -60,15 +60,13 @@ class PlayState extends FlxState
 
 			api.verboseMode = true;
 			var url:String;
-			var id:String;
 
 			api.randomPost.setTag("-animated").setTag("pawbert_lynxley").setTag("solo").setTag("rating:safe");
 
 			api.randomPost.search(postData ->
 			{
 				url = postData.sample_url;
-				id = postData.id;
-				trace(url, id);
+				trace(postData.id);
 				onSuccess(url);
 			}, err -> trace("Error: " + err));
 
