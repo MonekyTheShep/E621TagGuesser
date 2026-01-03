@@ -53,7 +53,7 @@ class PlayState extends FlxState
 
 	function getUrl(onSuccess:String->Void):Void
 	{
-		var future = new Future(() ->
+		new Future(() ->
 		{
 			var api:MonoSodiumPlusPlus = new MonoSodiumPlusPlus();
 
