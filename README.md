@@ -5,7 +5,7 @@
 Haxe Flixel e621 game that uses my e621 wrapper
 
 
-currently on reloads images from the api using femboy as tag.
+currently on reloads images from the api using femboy as tag may be suggestive content so beware.
 https://monekytheshep.github.io/E621TagGuesser/
 
 > [!IMPORTANT]
