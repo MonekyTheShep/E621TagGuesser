@@ -72,7 +72,7 @@ class PlayState extends FlxState
 			return url;
 		}, true);
 
-		future.onComplete(function(url)
+		future.onComplete((url) ->
 		{
 			trace("API response completed for:", url);
 		});
@@ -104,7 +104,7 @@ class PlayState extends FlxState
 		var bytes:ByteArray = loader.data;
 
 		var bitmapData = BitmapData.loadFromBytes(bytes);
-		bitmapData.onComplete(function(image)
+		bitmapData.onComplete((image) ->
 		{
 			spr.loadGraphic(image);
 			final factor:Float = Math.min(FlxG.width / spr.width, FlxG.height / spr.height);
