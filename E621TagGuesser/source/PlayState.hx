@@ -44,7 +44,7 @@ class PlayState extends FlxState
 		button.screenCenter();
 		button.cameras = [uiCamera];
 
-			
+		spr = new FlxSprite();
 		add(button);
 		add(spr);
 
