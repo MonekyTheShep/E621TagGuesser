@@ -27,6 +27,12 @@ class PlayState extends FlxState
 	override public function create()
 	{
 		super.create();
+
+		uiCamera = new FlxCamera();
+		uiCamera.bgColor = FlxColor.TRANSPARENT;
+		FlxG.cameras.add(uiCamera, false);
+		FlxG.camera.pixelPerfectRender = FlxG.camera.pixelPerfectShake = true;
+		
 		var button = new FlxButton(0, 0, "Reload", () ->
 		{
 			getUrl(url ->
@@ -35,14 +41,10 @@ class PlayState extends FlxState
 			});
 		});
 
-		uiCamera = new FlxCamera();
-		uiCamera.bgColor = FlxColor.TRANSPARENT;
-		FlxG.cameras.add(uiCamera, false);
-		FlxG.camera.pixelPerfectRender = FlxG.camera.pixelPerfectShake = true;
-
 		button.screenCenter();
 		button.cameras = [uiCamera];
-		spr = new FlxSprite();
+
+			
 		add(button);
 		add(spr);
 
