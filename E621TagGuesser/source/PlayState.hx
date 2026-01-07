@@ -77,6 +77,10 @@ class PlayState extends FlxState
 		{
 			trace("API response completed for:", url);
 		});
+		future.onError((err) ->
+		{
+			trace("Error", err);
+		});
 	}
 
 	override public function update(elapsed:Float)
