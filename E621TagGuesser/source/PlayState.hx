@@ -65,8 +65,8 @@ class PlayState extends FlxState
 
 			api.randomPost.search(postData ->
 			{
-				url = postData.sample_url;
-				trace(postData.id);
+				url = postData.post.file.url;
+				trace(postData.post.id);
 				onSuccess(url);
 			}, err -> trace("Error: " + err));
 
@@ -77,7 +77,7 @@ class PlayState extends FlxState
 		{
 			trace("API response completed for:", url);
 		});
-		future.onError((err) ->
+		future.onError((err:Dynamic) ->
 		{
 			trace("Error", err);
 		});

@@ -940,7 +940,7 @@ ApplicationMain.main = function() {
 ApplicationMain.create = function(config) {
 	var app = new openfl_display_Application();
 	ManifestResources.init(config);
-	app.meta.h["build"] = "23";
+	app.meta.h["build"] = "25";
 	app.meta.h["company"] = "HaxeFlixel";
 	app.meta.h["file"] = "E621TagGuesser";
 	app.meta.h["name"] = "E621TagGuesser";
@@ -5154,8 +5154,8 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 			var url;
 			api.randomPost.setTag("-animated").setTag("pawbert_lynxley").setTag("solo").setTag("rating:safe");
 			api.randomPost.search(function(postData) {
-				url = postData.sample_url;
-				haxe_Log.trace(postData.id,{ fileName : "source/PlayState.hx", lineNumber : 69, className : "PlayState", methodName : "getUrl"});
+				url = postData.post.file.url;
+				haxe_Log.trace(postData.post.id,{ fileName : "source/PlayState.hx", lineNumber : 69, className : "PlayState", methodName : "getUrl"});
 				onSuccess(url);
 			},function(err) {
 				haxe_Log.trace("Error: " + err,{ fileName : "source/PlayState.hx", lineNumber : 71, className : "PlayState", methodName : "getUrl"});
@@ -5164,6 +5164,9 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		},true);
 		future.onComplete(function(url) {
 			haxe_Log.trace("API response completed for:",{ fileName : "source/PlayState.hx", lineNumber : 78, className : "PlayState", methodName : "getUrl", customParams : [url]});
+		});
+		future.onError(function(err) {
+			haxe_Log.trace("Error",{ fileName : "source/PlayState.hx", lineNumber : 82, className : "PlayState", methodName : "getUrl", customParams : [err]});
 		});
 	}
 	,update: function(elapsed) {
@@ -68528,6 +68531,10 @@ haxe_http_HttpBase.prototype = {
 		}
 		this.params.push({ name : name, value : value});
 	}
+	,setPostData: function(data) {
+		this.postData = data;
+		this.postBytes = null;
+	}
 	,onData: function(data) {
 	}
 	,onBytes: function(data) {
@@ -88836,7 +88843,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 589413;
+	this.version = 405016;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
@@ -91191,25 +91198,57 @@ monosodiumplusplus_MonoSodiumPlusPlus.prototype = {
 	,__class__: monosodiumplusplus_MonoSodiumPlusPlus
 };
 var monosodiumplusplus_endpoints_EndPoint = function(monosodium) {
-	this.header = new haxe_ds_StringMap();
-	this.params = new haxe_ds_StringMap();
 	this.monosodium = monosodium;
 };
 $hxClasses["monosodiumplusplus.endpoints.EndPoint"] = monosodiumplusplus_endpoints_EndPoint;
 monosodiumplusplus_endpoints_EndPoint.__name__ = "monosodiumplusplus.endpoints.EndPoint";
 monosodiumplusplus_endpoints_EndPoint.prototype = {
+	monosodium: null
+	,buildAndExecuteRequest: function(request,onSuccess,onError) {
+		var httpBuilder = new monosodiumplusplus_endpoints_HttpBuilder();
+		if(this.monosodium.username != null && this.monosodium.api_token != null) {
+			httpBuilder.setHeader("Authorization","Basic " + haxe_crypto_Base64.encode(haxe_io_Bytes.ofString(this.monosodium.username + ":" + this.monosodium.api_token)));
+		}
+		if(request.endPointData != null) {
+			httpBuilder.setPostData(request.endPointData);
+		}
+		if(request.params != null) {
+			var h = request.params.h;
+			var _g_h = h;
+			var _g_keys = Object.keys(h);
+			var _g_length = _g_keys.length;
+			var _g_current = 0;
+			while(_g_current < _g_length) {
+				var key = _g_keys[_g_current++];
+				var _g_key = key;
+				var _g_value = _g_h[key];
+				var name = _g_key;
+				var value = _g_value;
+				if(this.monosodium.verboseMode) {
+					haxe_Log.trace("Setting Param:",{ fileName : "monosodiumplusplus/endpoints/EndPoint.hx", lineNumber : 47, className : "monosodiumplusplus.endpoints.EndPoint", methodName : "buildAndExecuteRequest", customParams : [name,value]});
+				}
+				httpBuilder.setParam(name,value);
+			}
+		}
+		httpBuilder.customRequest(request.url,request.method,function(data) {
+			onSuccess(data);
+		});
+	}
+	,__class__: monosodiumplusplus_endpoints_EndPoint
+};
+var monosodiumplusplus_endpoints_HttpBuilder = function() {
+	this.params = new haxe_ds_StringMap();
+	this.header = new haxe_ds_StringMap();
+};
+$hxClasses["monosodiumplusplus.endpoints.HttpBuilder"] = monosodiumplusplus_endpoints_HttpBuilder;
+monosodiumplusplus_endpoints_HttpBuilder.__name__ = "monosodiumplusplus.endpoints.HttpBuilder";
+monosodiumplusplus_endpoints_HttpBuilder.prototype = {
 	params: null
 	,header: null
-	,monosodium: null
-	,request: function(url,onSuccess,onError,method) {
-		var haxeHTTP = new haxe_http_HttpJs(url);
-		var verboseModeData = "Url Receiver: " + url;
-		if(this.monosodium.verboseMode) {
-			haxe_Log.trace(verboseModeData,{ fileName : "monosodiumplusplus/endpoints/EndPoint.hx", lineNumber : 24, className : "monosodiumplusplus.endpoints.EndPoint", methodName : "request"});
-		}
-		if(this.monosodium.username != null && this.monosodium.api_token != null) {
-			this.setHeader("Authorization","Basic " + haxe_crypto_Base64.encode(haxe_io_Bytes.ofString(this.monosodium.username + ":" + this.monosodium.api_token)));
-		}
+	,postData: null
+	,haxeHTTP: null
+	,customRequest: function(url,method,onSuccess,onError) {
+		this.haxeHTTP = new haxe_http_HttpJs(url);
 		var h = this.params.h;
 		var _g_h = h;
 		var _g_keys = Object.keys(h);
@@ -91219,12 +91258,9 @@ monosodiumplusplus_endpoints_EndPoint.prototype = {
 			var key = _g_keys[_g_current++];
 			var _g_key = key;
 			var _g_value = _g_h[key];
-			var name = _g_key;
-			var value = _g_value;
-			if(this.monosodium.verboseMode) {
-				haxe_Log.trace("Setting Param:",{ fileName : "monosodiumplusplus/endpoints/EndPoint.hx", lineNumber : 36, className : "monosodiumplusplus.endpoints.EndPoint", methodName : "request", customParams : [name,value]});
-			}
-			haxeHTTP.setParameter(name,value);
+			var paramName = _g_key;
+			var paramValue = _g_value;
+			this.haxeHTTP.setParameter(paramName,paramValue);
 		}
 		var h = this.header.h;
 		var _g_h = h;
@@ -91236,24 +91272,27 @@ monosodiumplusplus_endpoints_EndPoint.prototype = {
 			var _g_key = key;
 			var _g_value = _g_h[key];
 			var headerName = _g_key;
-			var value = _g_value;
-			if(this.monosodium.verboseMode) {
-				haxe_Log.trace("Setting Header:",{ fileName : "monosodiumplusplus/endpoints/EndPoint.hx", lineNumber : 41, className : "monosodiumplusplus.endpoints.EndPoint", methodName : "request", customParams : [headerName,value]});
-			}
-			haxeHTTP.setHeader(headerName,value);
+			var headerValue = _g_value;
+			this.haxeHTTP.setHeader(headerName,headerValue);
 		}
-		haxeHTTP.onData = function(data) {
+		if(this.postData != null) {
+			this.haxeHTTP.setPostData(this.postData);
+		}
+		this.haxeHTTP.onError = function(err) {
+			onError("Error: " + Std.string(err));
+		};
+		this.haxeHTTP.onStatus = function(status) {
+			haxe_Log.trace("Status Code: " + status,{ fileName : "monosodiumplusplus/endpoints/HttpBuilder.hx", lineNumber : 41, className : "monosodiumplusplus.endpoints.HttpBuilder", methodName : "customRequest"});
+		};
+		this.haxeHTTP.onData = function(data) {
 			onSuccess(data);
 		};
-		haxeHTTP.onError = function(err) {
-			haxe_Log.trace("Error: " + err,{ fileName : "monosodiumplusplus/endpoints/EndPoint.hx", lineNumber : 51, className : "monosodiumplusplus.endpoints.EndPoint", methodName : "request"});
-		};
-		haxeHTTP.onStatus = function(status) {
-			haxe_Log.trace("Status Code: " + status,{ fileName : "monosodiumplusplus/endpoints/EndPoint.hx", lineNumber : 57, className : "monosodiumplusplus.endpoints.EndPoint", methodName : "request"});
-		};
-		haxeHTTP.request(method);
-	}
-	,customRequest: function() {
+		if(method == "GET") {
+			haxe_Log.trace("get",{ fileName : "monosodiumplusplus/endpoints/HttpBuilder.hx", lineNumber : 50, className : "monosodiumplusplus.endpoints.HttpBuilder", methodName : "customRequest"});
+			this.haxeHTTP.request(false);
+		} else {
+			throw haxe_Exception.thrown("Not implemented method");
+		}
 	}
 	,setParam: function(name,value) {
 		this.params.h[name] = value;
@@ -91263,7 +91302,11 @@ monosodiumplusplus_endpoints_EndPoint.prototype = {
 		this.header.h[header] = value;
 		return this;
 	}
-	,__class__: monosodiumplusplus_endpoints_EndPoint
+	,setPostData: function(data) {
+		this.postData = data;
+		return this;
+	}
+	,__class__: monosodiumplusplus_endpoints_HttpBuilder
 };
 var monosodiumplusplus_endpoints_Routes = {};
 monosodiumplusplus_endpoints_Routes.PostById = function(id) {
@@ -91277,22 +91320,26 @@ monosodiumplusplus_endpoints_posts_SinglePost.__name__ = "monosodiumplusplus.end
 monosodiumplusplus_endpoints_posts_SinglePost.__super__ = monosodiumplusplus_endpoints_EndPoint;
 monosodiumplusplus_endpoints_posts_SinglePost.prototype = $extend(monosodiumplusplus_endpoints_EndPoint.prototype,{
 	search: function(id,onSuccess,onError) {
-		var url = this.monosodium.getUrl() + monosodiumplusplus_endpoints_Routes.PostById(id);
+		var url = this.monosodium.getUrl() + ("/posts/" + id + ".json");
 		var verboseModeData = "Fetching Single Post";
 		if(this.monosodium.verboseMode) {
-			haxe_Log.trace(verboseModeData,{ fileName : "monosodiumplusplus/endpoints/posts/Post.hx", lineNumber : 31, className : "monosodiumplusplus.endpoints.posts.SinglePost", methodName : "search"});
+			haxe_Log.trace(verboseModeData,{ fileName : "monosodiumplusplus/endpoints/posts/Post.hx", lineNumber : 26, className : "monosodiumplusplus.endpoints.posts.SinglePost", methodName : "search"});
 		}
-		this.setParam("id",id);
-		this.request(url,function(data) {
-			var postData = JSON.parse(data);
-			if(postData != null) {
+		var request = { url : url, method : "GET"};
+		this.buildAndExecuteRequest(request,function(data) {
+			try {
+				var postData = JSON.parse(data);
 				onSuccess(postData);
-			} else {
-				onError("Failed to parse JSON!");
+			} catch( _g ) {
+				haxe_NativeStackTrace.lastError = _g;
+				var err = haxe_Exception.caught(_g).unwrap();
+				haxe_Log.trace("Error",{ fileName : "monosodiumplusplus/endpoints/posts/Post.hx", lineNumber : 40, className : "monosodiumplusplus.endpoints.posts.SinglePost", methodName : "search", customParams : [err]});
+				onError("Failed to parse JSON!" + Std.string(err));
 			}
-		},function(err) {
-			onError("Failed to request data");
-		},false);
+		});
+	}
+	,edit: function(id,editPostSchema,onSuccess,onError) {
+		throw haxe_Exception.thrown("Not implemented edit in JS platforms");
 	}
 	,__class__: monosodiumplusplus_endpoints_posts_SinglePost
 });
@@ -91327,32 +91374,42 @@ monosodiumplusplus_endpoints_posts_Posts.prototype = $extend(monosodiumplusplus_
 		this.limit = limit == null ? "null" : "" + limit;
 		return this;
 	}
+	,buildParams: function() {
+		var params = new haxe_ds_StringMap();
+		if(this.tags.length > 0) {
+			var combineTags = this.tags.join(" ");
+			params.h["tags"] = combineTags;
+		}
+		if(this.limit != null) {
+			var v = this.limit;
+			params.h["limit"] = v;
+		}
+		if(this.page != null) {
+			var v = this.page;
+			params.h["page"] = v;
+		}
+		return params;
+	}
 	,search: function(onSuccess,onError) {
 		var url = this.monosodium.getUrl() + "/posts.json";
 		var verboseModeData = "Fetching Multiple Posts\nTags: " + Std.string(this.tags) + "\nPage Number: " + this.page + "\nPage Limit: " + this.limit;
 		if(this.monosodium.verboseMode) {
-			haxe_Log.trace(verboseModeData,{ fileName : "monosodiumplusplus/endpoints/posts/Posts.hx", lineNumber : 92, className : "monosodiumplusplus.endpoints.posts.Posts", methodName : "search"});
+			haxe_Log.trace(verboseModeData,{ fileName : "monosodiumplusplus/endpoints/posts/Posts.hx", lineNumber : 95, className : "monosodiumplusplus.endpoints.posts.Posts", methodName : "search"});
 		}
-		if(this.tags.length > 0) {
-			var combineTags = this.tags.join(" ");
-			this.setParam("tags",combineTags);
-		}
-		if(this.limit != null) {
-			this.setParam("limit",this.limit);
-		}
-		if(this.page != null) {
-			this.setParam("page",this.page);
-		}
-		this.request(url,function(data) {
-			var postData = JSON.parse(data);
-			if(postData != null) {
+		var request = { url : url, params : this.buildParams(), method : "GET"};
+		this.buildAndExecuteRequest(request,function(data) {
+			try {
+				var postData = JSON.parse(data);
 				onSuccess(postData);
-			} else {
-				onError("Failed to parse JSON!");
+			} catch( _g ) {
+				haxe_NativeStackTrace.lastError = _g;
+				var err = haxe_Exception.caught(_g).unwrap();
+				haxe_Log.trace("Error",{ fileName : "monosodiumplusplus/endpoints/posts/Posts.hx", lineNumber : 110, className : "monosodiumplusplus.endpoints.posts.Posts", methodName : "search", customParams : [err]});
+				onError("Failed to parse JSON!" + Std.string(err));
 			}
 		},function(err) {
-			onError("Failed to request data");
-		},false);
+			onError("Failed to connect to HTTP url" + err);
+		});
 	}
 	,__class__: monosodiumplusplus_endpoints_posts_Posts
 });
@@ -91375,35 +91432,34 @@ monosodiumplusplus_endpoints_posts_RandomPost.prototype = $extend(monosodiumplus
 		}
 		return this;
 	}
+	,buildParams: function() {
+		var params = new haxe_ds_StringMap();
+		if(this.tags.length > 0) {
+			var combineTags = this.tags.join(" ");
+			params.h["tags"] = combineTags;
+		}
+		return params;
+	}
 	,search: function(onSuccess,onError) {
 		var url = this.monosodium.getUrl() + "/posts/random.json";
 		var verboseModeData = "Fetching Random Post\nTags: " + Std.string(this.tags);
 		if(this.monosodium.verboseMode) {
-			haxe_Log.trace(verboseModeData,{ fileName : "monosodiumplusplus/endpoints/posts/RandomPost.hx", lineNumber : 53, className : "monosodiumplusplus.endpoints.posts.RandomPost", methodName : "search"});
+			haxe_Log.trace(verboseModeData,{ fileName : "monosodiumplusplus/endpoints/posts/RandomPost.hx", lineNumber : 60, className : "monosodiumplusplus.endpoints.posts.RandomPost", methodName : "search"});
 		}
-		if(this.tags.length > 0) {
-			var combineTags = this.tags.join(" ");
-			this.setParam("tags",combineTags);
-		}
-		this.request(url,function(data) {
-			var postData = { };
-			var jsonData = JSON.parse(data);
-			var _g = 0;
-			var _g1 = Reflect.fields(jsonData);
-			while(_g < _g1.length) {
-				var field = _g1[_g];
-				++_g;
-				var value = Reflect.getProperty(jsonData,field);
-				postData[field] = value;
-			}
-			if(postData != null) {
+		var request = { url : url, params : this.buildParams(), method : "GET"};
+		this.buildAndExecuteRequest(request,function(data) {
+			try {
+				var postData = JSON.parse(data);
 				onSuccess(postData);
-			} else {
-				onError("Failed to parse JSON!");
+			} catch( _g ) {
+				haxe_NativeStackTrace.lastError = _g;
+				var err = haxe_Exception.caught(_g).unwrap();
+				haxe_Log.trace("Error",{ fileName : "monosodiumplusplus/endpoints/posts/RandomPost.hx", lineNumber : 75, className : "monosodiumplusplus.endpoints.posts.RandomPost", methodName : "search", customParams : [err]});
+				onError("Failed to parse JSON!" + Std.string(err));
 			}
 		},function(err) {
-			onError("Failed to request data");
-		},false);
+			onError("Failed to connect to HTTP url" + err);
+		});
 	}
 	,__class__: monosodiumplusplus_endpoints_posts_RandomPost
 });
