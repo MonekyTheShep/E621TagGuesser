@@ -940,7 +940,7 @@ ApplicationMain.main = function() {
 ApplicationMain.create = function(config) {
 	var app = new openfl_display_Application();
 	ManifestResources.init(config);
-	app.meta.h["build"] = "25";
+	app.meta.h["build"] = "26";
 	app.meta.h["company"] = "HaxeFlixel";
 	app.meta.h["file"] = "E621TagGuesser";
 	app.meta.h["name"] = "E621TagGuesser";
@@ -5154,19 +5154,20 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 			var url;
 			api.randomPost.setTag("-animated").setTag("pawbert_lynxley").setTag("solo").setTag("rating:safe");
 			api.randomPost.search(function(postData) {
-				url = postData.post.file.url;
-				haxe_Log.trace(postData.post.id,{ fileName : "source/PlayState.hx", lineNumber : 69, className : "PlayState", methodName : "getUrl"});
-				onSuccess(url);
+				haxe_Log.trace(postData.post.id,{ fileName : "source/PlayState.hx", lineNumber : 66, className : "PlayState", methodName : "getUrl"});
+				if(postData.post.sample.url != null) {
+					onSuccess(postData.post.sample.url);
+					haxe_Log.trace("API response completed for:",{ fileName : "source/PlayState.hx", lineNumber : 70, className : "PlayState", methodName : "getUrl", customParams : [postData.post.sample.url]});
+				} else {
+					onSuccess(postData.post.file.url);
+					haxe_Log.trace("API response completed for:",{ fileName : "source/PlayState.hx", lineNumber : 75, className : "PlayState", methodName : "getUrl", customParams : [postData.post.file.url]});
+				}
 			},function(err) {
-				haxe_Log.trace("Error: " + err,{ fileName : "source/PlayState.hx", lineNumber : 71, className : "PlayState", methodName : "getUrl"});
+				haxe_Log.trace("Error: " + err,{ fileName : "source/PlayState.hx", lineNumber : 79, className : "PlayState", methodName : "getUrl"});
 			});
-			return url;
 		},true);
-		future.onComplete(function(url) {
-			haxe_Log.trace("API response completed for:",{ fileName : "source/PlayState.hx", lineNumber : 78, className : "PlayState", methodName : "getUrl", customParams : [url]});
-		});
 		future.onError(function(err) {
-			haxe_Log.trace("Error",{ fileName : "source/PlayState.hx", lineNumber : 82, className : "PlayState", methodName : "getUrl", customParams : [err]});
+			haxe_Log.trace("Error",{ fileName : "source/PlayState.hx", lineNumber : 90, className : "PlayState", methodName : "getUrl", customParams : [err]});
 		});
 	}
 	,update: function(elapsed) {
@@ -88843,7 +88844,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 405016;
+	this.version = 327492;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";

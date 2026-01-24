@@ -7,14 +7,12 @@ import flixel.FlxState;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
 import lime.app.Future;
-import lime.graphics.Image;
 import monosodiumplusplus.MonoSodiumPlusPlus;
 import openfl.display.BitmapData;
 import openfl.events.Event;
 import openfl.net.URLLoader;
 import openfl.net.URLLoaderDataFormat;
 import openfl.net.URLRequest;
-import openfl.net.URLRequestHeader;
 import openfl.utils.ByteArray;
 
 class PlayState extends FlxState
@@ -65,18 +63,28 @@ class PlayState extends FlxState
 
 			api.randomPost.search(postData ->
 			{
-				url = postData.post.file.url;
 				trace(postData.post.id);
-				onSuccess(url);
+				if (postData.post.sample.url != null)
+				{
+					onSuccess(postData.post.sample.url);
+					trace("API response completed for:", postData.post.sample.url);
+				}
+				else
+				{
+					onSuccess(postData.post.file.url);
+					trace("API response completed for:", postData.post.file.url);
+				}
+
+				
 			}, err -> trace("Error: " + err));
 
-			return url;
+			// return url;
 		}, true);
 
-		future.onComplete((url) ->
-		{
-			trace("API response completed for:", url);
-		});
+		// future.onComplete((url) ->
+		// {
+
+		// });
 		future.onError((err:Dynamic) ->
 		{
 			trace("Error", err);
