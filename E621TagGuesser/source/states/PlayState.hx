@@ -1,4 +1,4 @@
-package;
+package states;
 
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -16,6 +16,7 @@ import openfl.net.URLLoaderDataFormat;
 import openfl.net.URLRequest;
 import openfl.net.URLRequestHeader;
 import openfl.utils.ByteArray;
+import utility.E6ImageHandler;
 
 class PlayState extends FlxState
 {

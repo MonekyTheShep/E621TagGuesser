@@ -1,4 +1,4 @@
-package;
+package utility;
 
 import lime.app.Future;
 import monosodiumplusplus.MonoSodiumPlusPlus;
