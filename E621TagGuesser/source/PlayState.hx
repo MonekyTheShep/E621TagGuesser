@@ -13,6 +13,7 @@ import openfl.events.Event;
 import openfl.net.URLLoader;
 import openfl.net.URLLoaderDataFormat;
 import openfl.net.URLRequest;
+import openfl.net.URLRequestHeader;
 import openfl.utils.ByteArray;
 
 class PlayState extends FlxState
