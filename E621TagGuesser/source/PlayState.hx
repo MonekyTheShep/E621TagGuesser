@@ -4,6 +4,7 @@ import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
+import flixel.addons.ui.FlxInputText;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
 import lime.app.Future;
@@ -28,9 +29,9 @@ class PlayState extends FlxState
 		super.create();
 		var button = new FlxButton(0, 0, "Reload", () ->
 		{
-			getUrl(url ->
+			E6ImageHandler.getRandomImage(e6image ->
 			{
-				imageUrl = url;
+				imageUrl = e6image.url;
 			});
 		});
 
@@ -39,57 +40,34 @@ class PlayState extends FlxState
 		FlxG.cameras.add(uiCamera, false);
 		FlxG.camera.pixelPerfectRender = FlxG.camera.pixelPerfectShake = true;
 
+		// button
 		button.screenCenter();
 		button.cameras = [uiCamera];
 		spr = new FlxSprite();
+		// Input field
+		var inputField = new FlxInputText(0, 0, 100, "", 10);
+		inputField.screenCenter();
+		inputField.y = button.y - 30;
+
+		inputField.cameras = [uiCamera];
+		inputField.antialiasing = true;
+
+		inputField.callback = function(text, action)
+		{
+			if (action == "enter")
+			{
+				trace("Input changed with enter: " + inputField.text);
+			}
+		};
 		add(button);
+		add(inputField);
 		add(spr);
 
-		getUrl(url ->
+		E6ImageHandler.getRandomImage(e6image ->
 		{
-			imageUrl = url;
+			imageUrl = e6image.url;
 		});
-	}
 
-	function getUrl(onSuccess:String->Void):Void
-	{
-		var future = new Future(() ->
-		{
-			var api:MonoSodiumPlusPlus = new MonoSodiumPlusPlus();
-
-			api.verboseMode = true;
-			var url:String;
-
-			api.randomPost.setTag("-animated").setTag("pawbert_lynxley").setTag("solo").setTag("rating:safe");
-
-			api.randomPost.search(postData ->
-			{
-				trace(postData.post.id);
-				if (postData.post.sample.url != null)
-				{
-					trace("API response completed for:", postData.post.sample.url);
-					onSuccess(postData.post.sample.url);
-				}
-				else
-				{
-					trace("API response completed for:", postData.post.file.url);
-					onSuccess(postData.post.file.url);
-				}
-
-				
-			}, err -> trace("Error: " + err));
-
-			// return url;
-		}, true);
-
-		// future.onComplete((url) ->
-		// {
-
-		// });
-		future.onError((err:Dynamic) ->
-		{
-			trace("Error", err);
-		});
 	}
 
 	override public function update(elapsed:Float)
@@ -97,19 +75,23 @@ class PlayState extends FlxState
 		super.update(elapsed);
 		if (imageUrl != "")
 		{
-			loader.addEventListener(Event.COMPLETE, onComplete);
-			loader.dataFormat = URLLoaderDataFormat.BINARY;
-			var request:URLRequest = new URLRequest(imageUrl);
-			imageUrl = "";
-			// cant set user agent on js platform
-			#if !js
-			request.requestHeaders = [
-				new URLRequestHeader("User-Agent", "MonoSodiumPlusPlus/1.0 (by MonekyTheShep on github)")
-			];
-			#end
-			loader.load(request);
-			
+			getImageByteData();
 		}
+	}
+
+	function getImageByteData():Void
+	{
+		loader.addEventListener(Event.COMPLETE, onComplete);
+		loader.dataFormat = URLLoaderDataFormat.BINARY;
+		var request:URLRequest = new URLRequest(imageUrl);
+		imageUrl = "";
+		// cant set user agent on js platform
+		#if !js
+		request.requestHeaders = [
+			new URLRequestHeader("User-Agent", "MonoSodiumPlusPlus/1.0 (by MonekyTheShep on github)")
+		];
+		#end
+		loader.load(request);
 	}
 
 	function onComplete(e:Event):Void
