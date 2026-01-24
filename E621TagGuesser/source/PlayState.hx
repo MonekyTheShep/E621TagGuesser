@@ -7,14 +7,12 @@ import flixel.FlxState;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
 import lime.app.Future;
-import lime.graphics.Image;
 import monosodiumplusplus.MonoSodiumPlusPlus;
 import openfl.display.BitmapData;
 import openfl.events.Event;
 import openfl.net.URLLoader;
 import openfl.net.URLLoaderDataFormat;
 import openfl.net.URLRequest;
-import openfl.net.URLRequestHeader;
 import openfl.utils.ByteArray;
 
 class PlayState extends FlxState
@@ -27,12 +25,6 @@ class PlayState extends FlxState
 	override public function create()
 	{
 		super.create();
-
-		uiCamera = new FlxCamera();
-		uiCamera.bgColor = FlxColor.TRANSPARENT;
-		FlxG.cameras.add(uiCamera, false);
-		FlxG.camera.pixelPerfectRender = FlxG.camera.pixelPerfectShake = true;
-		
 		var button = new FlxButton(0, 0, "Reload", () ->
 		{
 			getUrl(url ->
@@ -41,9 +33,13 @@ class PlayState extends FlxState
 			});
 		});
 
+		uiCamera = new FlxCamera();
+		uiCamera.bgColor = FlxColor.TRANSPARENT;
+		FlxG.cameras.add(uiCamera, false);
+		FlxG.camera.pixelPerfectRender = FlxG.camera.pixelPerfectShake = true;
+
 		button.screenCenter();
 		button.cameras = [uiCamera];
-
 		spr = new FlxSprite();
 		add(button);
 		add(spr);
@@ -67,17 +63,31 @@ class PlayState extends FlxState
 
 			api.randomPost.search(postData ->
 			{
-				url = postData.sample_url;
-				trace(postData.id);
-				onSuccess(url);
+				trace(postData.post.id);
+				if (postData.post.sample.url != null)
+				{
+					onSuccess(postData.post.sample.url);
+					trace("API response completed for:", postData.post.sample.url);
+				}
+				else
+				{
+					onSuccess(postData.post.file.url);
+					trace("API response completed for:", postData.post.file.url);
+				}
+
+				
 			}, err -> trace("Error: " + err));
 
-			return url;
+			// return url;
 		}, true);
 
-		future.onComplete((url) ->
+		// future.onComplete((url) ->
+		// {
+
+		// });
+		future.onError((err:Dynamic) ->
 		{
-			trace("API response completed for:", url);
+			trace("Error", err);
 		});
 	}
 
