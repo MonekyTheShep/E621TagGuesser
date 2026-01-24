@@ -13,6 +13,7 @@ import openfl.events.Event;
 import openfl.net.URLLoader;
 import openfl.net.URLLoaderDataFormat;
 import openfl.net.URLRequest;
+import openfl.net.URLRequestHeader;
 import openfl.utils.ByteArray;
 
 class PlayState extends FlxState
@@ -66,13 +67,13 @@ class PlayState extends FlxState
 				trace(postData.post.id);
 				if (postData.post.sample.url != null)
 				{
-					onSuccess(postData.post.sample.url);
 					trace("API response completed for:", postData.post.sample.url);
+					onSuccess(postData.post.sample.url);
 				}
 				else
 				{
-					onSuccess(postData.post.file.url);
 					trace("API response completed for:", postData.post.file.url);
+					onSuccess(postData.post.file.url);
 				}
 
 				
