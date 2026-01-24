@@ -940,7 +940,7 @@ ApplicationMain.main = function() {
 ApplicationMain.create = function(config) {
 	var app = new openfl_display_Application();
 	ManifestResources.init(config);
-	app.meta.h["build"] = "26";
+	app.meta.h["build"] = "27";
 	app.meta.h["company"] = "HaxeFlixel";
 	app.meta.h["file"] = "E621TagGuesser";
 	app.meta.h["name"] = "E621TagGuesser";
@@ -5156,11 +5156,11 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 			api.randomPost.search(function(postData) {
 				haxe_Log.trace(postData.post.id,{ fileName : "source/PlayState.hx", lineNumber : 66, className : "PlayState", methodName : "getUrl"});
 				if(postData.post.sample.url != null) {
+					haxe_Log.trace("API response completed for:",{ fileName : "source/PlayState.hx", lineNumber : 69, className : "PlayState", methodName : "getUrl", customParams : [postData.post.sample.url]});
 					onSuccess(postData.post.sample.url);
-					haxe_Log.trace("API response completed for:",{ fileName : "source/PlayState.hx", lineNumber : 70, className : "PlayState", methodName : "getUrl", customParams : [postData.post.sample.url]});
 				} else {
+					haxe_Log.trace("API response completed for:",{ fileName : "source/PlayState.hx", lineNumber : 74, className : "PlayState", methodName : "getUrl", customParams : [postData.post.file.url]});
 					onSuccess(postData.post.file.url);
-					haxe_Log.trace("API response completed for:",{ fileName : "source/PlayState.hx", lineNumber : 75, className : "PlayState", methodName : "getUrl", customParams : [postData.post.file.url]});
 				}
 			},function(err) {
 				haxe_Log.trace("Error: " + err,{ fileName : "source/PlayState.hx", lineNumber : 79, className : "PlayState", methodName : "getUrl"});
@@ -88844,7 +88844,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 327492;
+	this.version = 322487;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
