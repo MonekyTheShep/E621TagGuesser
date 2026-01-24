@@ -5,7 +5,7 @@ import monosodiumplusplus.MonoSodiumPlusPlus;
 
 
 typedef E6Image = {
-    var url:String;
+	var ?url:String;
     var tags:Array<String>;  
 }
 
@@ -22,26 +22,13 @@ class E6ImageHandler {
 			api.randomPost.search(postData ->
 			{
 				trace(postData.post.id);
-				if (postData.post.sample.url != null)
-				{
-					trace("API response completed for:", postData.post.sample.url);
-                    var e6data:E6Image = 
-                    {
-                        url: postData.post.sample.url, 
-                        tags: postData.post.tags.general
-                    }
-					onSuccess(e6data);
+				var e6data:E6Image = {
+					tags: postData.post.tags.general
 				}
-				else
-				{
-					trace("API response completed for:", postData.post.file.url);
-					var e6data:E6Image = 
-                    {
-                        url: postData.post.file.url,
-                        tags: postData.post.tags.general
-                    }
-					onSuccess(e6data);
-				}
+				e6data.url = postData.post.sample.url ?? postData.post.file.url;
+
+				trace("API response completed for:", e6data.url);
+				onSuccess(e6data);
 
 				
 			}, err -> trace("Error: " + err));
