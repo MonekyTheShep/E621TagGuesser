@@ -31,7 +31,8 @@ class HttpBuilder {
             onResult(data);
         }
 
-        haxeHTTP.onError = function(err:String) {
+		haxeHTTP.onError = function(err:Dynamic)
+		{
 
             trace("Error: " + err);
             
