@@ -7,8 +7,6 @@ import flixel.FlxState;
 import flixel.addons.ui.FlxInputText;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
-import lime.app.Future;
-import monosodiumplusplus.MonoSodiumPlusPlus;
 import openfl.display.BitmapData;
 import openfl.events.Event;
 import openfl.net.URLLoader;
@@ -20,10 +18,11 @@ import utility.E6ImageHandler;
 
 class PlayState extends FlxState
 {
-	var spr:FlxSprite;
+	var imageSpr:FlxSprite;
 	var uiCamera:FlxCamera;
 	var loader:URLLoader = new URLLoader();
 	var imageUrl:String = "";
+	var images:Array<E6Image> = [];
 
 	override public function create()
 	{
@@ -32,6 +31,7 @@ class PlayState extends FlxState
 		{
 			E6ImageHandler.getRandomImage(e6image ->
 			{
+				images.push(e6image);
 				imageUrl = e6image.url;
 			});
 		});
@@ -44,7 +44,7 @@ class PlayState extends FlxState
 		// button
 		button.screenCenter();
 		button.cameras = [uiCamera];
-		spr = new FlxSprite();
+		imageSpr = new FlxSprite();
 		// Input field
 		var inputField = new FlxInputText(0, 0, 100, "", 10);
 		inputField.screenCenter();
@@ -53,19 +53,28 @@ class PlayState extends FlxState
 		inputField.cameras = [uiCamera];
 		inputField.antialiasing = true;
 
-		inputField.callback = function(text, action)
+		inputField.callback = (text, action) ->
 		{
 			if (action == "enter")
 			{
 				trace("Input changed with enter: " + inputField.text);
+				final lastElementIndex:Int = images.length - 1;
+
+				if (images[lastElementIndex].tags.contains(text))
+				{
+					trace("Found tag");
+				}
+				
 			}
 		};
+
 		add(button);
 		add(inputField);
-		add(spr);
+		add(imageSpr);
 
 		E6ImageHandler.getRandomImage(e6image ->
 		{
+			images.push(e6image);
 			imageUrl = e6image.url;
 		});
 
@@ -76,15 +85,17 @@ class PlayState extends FlxState
 		super.update(elapsed);
 		if (imageUrl != "")
 		{
-			getImageByteData();
+			getImageUrlByteData(imageUrl);
+			final lastElementIndex:Int = images.length - 1;
+			trace(images[lastElementIndex].tags);
 		}
 	}
 
-	function getImageByteData():Void
+	function getImageUrlByteData(url:String):Void
 	{
 		loader.addEventListener(Event.COMPLETE, onComplete);
 		loader.dataFormat = URLLoaderDataFormat.BINARY;
-		var request:URLRequest = new URLRequest(imageUrl);
+		var request:URLRequest = new URLRequest(url);
 		imageUrl = "";
 		// cant set user agent on js platform
 		#if !js
@@ -103,11 +114,11 @@ class PlayState extends FlxState
 		var bitmapData = BitmapData.loadFromBytes(bytes);
 		bitmapData.onComplete((image) ->
 		{
-			spr.loadGraphic(image);
-			final factor:Float = Math.min(FlxG.width / spr.width, FlxG.height / spr.height);
-			spr.scale.set(factor, factor);
-			spr.screenCenter();
-			spr.antialiasing = true;
+			imageSpr.loadGraphic(image);
+			final factor:Float = Math.min(FlxG.width / imageSpr.width, FlxG.height / imageSpr.height);
+			imageSpr.scale.set(factor, factor);
+			imageSpr.screenCenter();
+			imageSpr.antialiasing = true;
 		});
 		
 
