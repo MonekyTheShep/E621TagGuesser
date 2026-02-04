@@ -2,10 +2,12 @@ package utility;
 
 import lime.app.Future;
 import monosodiumplusplus.MonoSodiumPlusPlus;
+import openfl.display.BitmapData;
 
 
 typedef E6Image = {
 	var ?url:String;
+	var ?imageData:BitmapData;
     var tags:Array<String>;  
 }
 
@@ -13,11 +15,12 @@ class E6ImageHandler {
     public static function getRandomImage(onSuccess:(E6Image)->Void) {
         var future = new Future(() ->
 		{
-			var api:MonoSodiumPlusPlus = new MonoSodiumPlusPlus();
+			var api:MonoSodiumPlusPlus = new MonoSodiumPlusPlus(MonosodiumFlavor.E621);
 
 			api.verboseMode = true;
 
-			api.randomPost.setTag("-animated").setTag("pawbert_lynxley").setTag("solo").setTag("rating:safe");
+			api.randomPost.setTag("-animated").setTag("pawbert_lynxley").setTag("solo");
+
 
 			api.randomPost.search(postData ->
 			{
