@@ -5,13 +5,15 @@ import monosodiumplusplus.MonoSodiumPlusPlus;
 import openfl.display.BitmapData;
 
 
-typedef E6Image = {
+typedef E6Image =
+{
 	var ?url:String;
 	var ?imageData:BitmapData;
     var tags:Array<String>;  
 }
 
-class E6ImageHandler {
+class E6ImageHandler
+{
     public static function getRandomImage(onSuccess:(E6Image)->Void) {
         var future = new Future(() ->
 		{
