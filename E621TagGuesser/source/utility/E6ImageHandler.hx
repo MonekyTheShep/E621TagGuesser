@@ -14,7 +14,8 @@ typedef E6Image =
 
 class E6ImageHandler
 {
-    public static function getRandomImage(onSuccess:(E6Image)->Void) {
+	public static function getRandomImage(onSuccess:(E6Image) -> Void)
+	{
         var future = new Future(() ->
 		{
 			var api:MonoSodiumPlusPlus = new MonoSodiumPlusPlus(MonosodiumFlavor.E621);
