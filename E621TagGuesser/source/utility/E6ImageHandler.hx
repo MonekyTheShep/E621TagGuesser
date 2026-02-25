@@ -18,14 +18,13 @@ class E6ImageHandler
 	{
         var future = new Future(() ->
 		{
-			var api:MonoSodiumPlusPlus = new MonoSodiumPlusPlus(MonosodiumFlavor.E621);
+			// var api:MonoSodiumPlusPlus = new MonoSodiumPlusPlus(MonosodiumFlavor.E621);
+			var api:MonoSodiumPlusPlus = new MonoSodiumPlusPlus();
 
 			api.verboseMode = true;
 
-			api.randomPost.setTag("-animated").setTag("pawbert_lynxley").setTag("solo");
 
-
-			api.randomPost.search(postData ->
+			api.randomPost.search({tags: ["femboy", "-female"]}, postData ->
 			{
 				trace(postData.post.id);
 				var e6data:E6Image = {
